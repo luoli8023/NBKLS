@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>物料信息采集程序</title>
+<style>
+    body {
+        font-family: '微软雅黑', sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    .btn {
+        padding: 10px 20px;
+        margin: 10px 0;
+        cursor: pointer;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+</style>
+<script>
+let materials = JSON.parse(localStorage.getItem('materials')) || {};
+
+function saveMaterials() {
+    localStorage.setItem('materials', JSON.stringify(materials));
+}
+
+function addMaterial() {
+    let name = prompt('请输入物料名称:');
+    if (name) {
+        let process = prompt('请输入生产工艺:');
+        let capacity = prompt('请输入标准产能:');
+        if (process && capacity) {
+            materials[name] = { process, capacity };
+            saveMaterials();
+            alert('物料信息已保存!');
+        }
+    }
+}
+
+function createNew() {
+    let name = prompt('请输入物料名称:');
+    if (name) {
+        let tableBody = document.getElementById('materialTableBody');
+        let newRow = tableBody.insertRow();
+        let material = materials[name] || {};
+        let cell = newRow.insertCell();
+        cell.textContent = name;
+        let cell2 = newRow.insertCell();
+        cell2.textContent = '生产工艺: ' + (material.process || '');
+        let cell3 = newRow.insertCell();
+        cell3.textContent = '标准产能: ' + (material.capacity || '');
+        let cell4 = newRow.insertCell();
+        let input = document.createElement('input');
+        input.type = 'number';
+        input.value = 0;
+        input.onchange = updateTotal;
+        cell4.appendChild(input);
+        updateTotal();
+    }
+}
+
+function updateTotal() {
+    let total = 0;
+    let inputs = document.querySelectorAll('#materialTableBody input[type="number"]');
+    inputs.forEach(input => {
+        total += parseInt(input.value) || 0;
+    });
+    document.getElementById('totalValue').textContent = total;
+}
+
+window.onload = function() {
+    createNew();
+};
+</script>
+
+</head>
+<body>
+
+<div class="container">
+    <h1>物料信息采集程序</h1>
+    <button class="btn" onclick="addMaterial()">添加物料</button>
+    <button class="btn" onclick="createNew()">新建</button>
+    <table>
+        <thead>
+            <tr>
+                <th>物料名称</th>
+                <th>生产工艺</th>
+                <th>标准产能</th>
+                <th>实际完成量</th>
+            </tr>
+        </thead>
+        <tbody id="materialTableBody">
+        </tbody>
+    </table>
+    <div id="total">合计: <span id="totalValue">0</span></div>
+    <!-- 添加壁纸图片 -->
+    <img src="https://s2.loli.net/2024/12/05/sdhYe8XHmTuwfUS.webp" alt="壁纸" style="width: 100%; height: auto; margin-top: 20px;">
+</div>
+
+</body>
+</html>
